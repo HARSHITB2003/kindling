@@ -1,6 +1,14 @@
-import { wipeEverything } from '../storage/storage.js';
+import { useState } from 'react';
+import {
+  wipeEverything,
+  loadSample,
+  getPeople,
+} from '../storage/storage.js';
+import { samples } from '../data/samples.js';
 
 export default function PrivacyFooter() {
+  const [flash, setFlash] = useState(null);
+
   const onReset = () => {
     if (
       confirm(
@@ -11,6 +19,20 @@ export default function PrivacyFooter() {
       window.location.hash = '';
       window.location.reload();
     }
+  };
+
+  const onLoadSamples = () => {
+    const before = new Set(getPeople().map((p) => p.id));
+    samples.forEach((s) => loadSample(s.person, s.notes));
+    const added = samples.filter((s) => !before.has(s.person.id)).length;
+    setFlash(
+      added === 0
+        ? 'all three samples are already on the shelf.'
+        : `added ${added} sample volume${added === 1 ? '' : 's'}. refresh to see them.`
+    );
+    setTimeout(() => {
+      window.location.reload();
+    }, 900);
   };
 
   return (
@@ -29,6 +51,15 @@ export default function PrivacyFooter() {
       >
         <button
           type="button"
+          onClick={onLoadSamples}
+          className="underline decoration-dotted underline-offset-[3px] hover:text-ember transition-colors"
+          style={{ fontFamily: 'var(--font-plex-mono)' }}
+        >
+          add the sample volumes
+        </button>
+        <span className="mx-2">·</span>
+        <button
+          type="button"
           onClick={onReset}
           className="underline decoration-dotted underline-offset-[3px] hover:text-ember transition-colors"
           style={{ fontFamily: 'var(--font-plex-mono)' }}
@@ -45,6 +76,14 @@ export default function PrivacyFooter() {
           source on github
         </a>
       </p>
+      {flash && (
+        <p
+          className="mt-2 text-[11px] text-olive italic"
+          style={{ fontFamily: 'var(--font-plex-serif)' }}
+        >
+          {flash}
+        </p>
+      )}
     </footer>
   );
 }

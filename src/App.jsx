@@ -18,11 +18,16 @@ export default function App() {
   const refresh = () => setRefreshKey((k) => k + 1);
 
   // first-visit seed: pre-load the three sample volumes so reviewers land
-  // on a populated shelf. only runs once — tracked by haveSamplesLoaded().
+  // on a populated shelf. loadSample dedupes by id, so any samples the user
+  // already added (or has kept from a prior visit) are left alone.
   useEffect(() => {
-    if (!haveSamplesLoaded() && getPeople().length === 0) {
+    if (!haveSamplesLoaded()) {
       samples.forEach((s) => loadSample(s.person, s.notes));
       markSamplesLoaded();
+    } else {
+      // self-heal: if the flag is set but a sample is missing (deleted by
+      // mistake, or the data shape has been extended), we don't re-add —
+      // user intent wins. reset demo from the footer brings them back.
     }
     setBootReady(true);
   }, []);
