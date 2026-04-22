@@ -6,11 +6,13 @@ import { samples, isSamplePersonId } from '../data/samples.js';
 import SundayNudge from './SundayNudge.jsx';
 import PrivacyFooter from './PrivacyFooter.jsx';
 import Spine from './Spine.jsx';
+import Tour from './Tour.jsx';
 
 export default function Shelf({ onOpenPerson, refreshKey, onRefresh }) {
   const [addingPerson, setAddingPerson] = useState(false);
   const [newName, setNewName] = useState('');
   const [hoveredId, setHoveredId] = useState(null);
+  const [tourOpen, setTourOpen] = useState(false);
   const people = getPeople();
 
   const handleAdd = (e) => {
@@ -35,6 +37,8 @@ export default function Shelf({ onOpenPerson, refreshKey, onRefresh }) {
 
   if (people.length === 0) {
     return (
+      <>
+      {tourOpen && <Tour onClose={() => setTourOpen(false)} />}
       <div className="min-h-screen px-6 pt-16 sm:pt-24 pb-24 paper-grain">
         <div className="max-w-3xl mx-auto">
           <h1
@@ -67,13 +71,23 @@ export default function Shelf({ onOpenPerson, refreshKey, onRefresh }) {
                 }}
               />
             ) : (
-              <button
-                onClick={() => setAddingPerson(true)}
-                className="handline text-[20px] text-indigo-ink hover:opacity-80 transition-opacity"
-                style={{ fontFamily: 'var(--font-fraunces)', fontWeight: 500 }}
-              >
-                add your first person
-              </button>
+              <div className="flex items-center gap-6 flex-wrap">
+                <button
+                  onClick={() => setAddingPerson(true)}
+                  className="handline text-[20px] text-indigo-ink hover:opacity-80 transition-opacity"
+                  style={{ fontFamily: 'var(--font-fraunces)', fontWeight: 500 }}
+                >
+                  add your first person
+                </button>
+                <span className="text-pencil" style={{ fontFamily: 'var(--font-fraunces)' }}>·</span>
+                <button
+                  onClick={() => setTourOpen(true)}
+                  className="text-[15px] text-indigo-soft hover:text-ember transition-colors"
+                  style={{ fontFamily: 'var(--font-fraunces)' }}
+                >
+                  watch a 20-second tour
+                </button>
+              </div>
             )}
           </div>
 
@@ -130,10 +144,13 @@ export default function Shelf({ onOpenPerson, refreshKey, onRefresh }) {
 
         <PrivacyFooter />
       </div>
+      </>
     );
   }
 
   return (
+    <>
+    {tourOpen && <Tour onClose={() => setTourOpen(false)} />}
     <div className="min-h-screen px-4 sm:px-8 pt-12 sm:pt-16 pb-16 paper-grain">
       <div className="max-w-5xl mx-auto">
         <header className="flex items-end justify-between flex-wrap gap-y-4 px-2 sm:px-4">
@@ -143,15 +160,24 @@ export default function Shelf({ onOpenPerson, refreshKey, onRefresh }) {
           >
             kindling.
           </h1>
-          {!addingPerson && (
+          <div className="flex items-center gap-5">
             <button
-              onClick={() => setAddingPerson(true)}
-              className="text-[15px] text-indigo-soft hover:text-indigo-ink transition-colors"
-              style={{ fontFamily: 'var(--font-fraunces)', fontWeight: 500 }}
+              onClick={() => setTourOpen(true)}
+              className="text-[13px] text-pencil hover:text-indigo-ink transition-colors"
+              style={{ fontFamily: 'var(--font-fraunces)' }}
             >
-              + add a volume
+              tour
             </button>
-          )}
+            {!addingPerson && (
+              <button
+                onClick={() => setAddingPerson(true)}
+                className="text-[15px] text-indigo-soft hover:text-indigo-ink transition-colors"
+                style={{ fontFamily: 'var(--font-fraunces)', fontWeight: 500 }}
+              >
+                + add a volume
+              </button>
+            )}
+          </div>
         </header>
 
         <p
@@ -274,6 +300,7 @@ export default function Shelf({ onOpenPerson, refreshKey, onRefresh }) {
 
       <PrivacyFooter />
     </div>
+    </>
   );
 }
 
